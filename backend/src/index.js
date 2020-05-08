@@ -18,7 +18,17 @@ function logRequests(request, response, next) {
   console.timeEnd(longLabel);
 }
 
+function validateProjectId(request, response, next) {
+  const { id } = request.params;
+
+  if (!isUuid(id)) {
+    return response.status(400).json({ error: "Invalid Project ID." });
+  }
+  return next();
+}
+
 app.use(logRequests);
+app.use("/projects/:id", validateProjectId);
 
 app.get("/projects", (request, response) => {
   const { title } = request.query;
@@ -36,12 +46,13 @@ app.post("/projects", (request, response) => {
   const project = { id: uuid(), title, owner };
   projects.push(project);
 
-  return response.json(project);
+  return response.json(projects);
 });
 
 app.put("/projects/:id", (request, response) => {
   const { id } = request.params;
   const { title, owner } = request.body;
+
   const projectIndex = projects.findIndex((project) => project.id == id);
   if (projectIndex < 0) {
     return response.status(400).json({ error: "Project not found" });
