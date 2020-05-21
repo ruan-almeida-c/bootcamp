@@ -1,11 +1,14 @@
 const express = require("express"); /* Importando express*/
 const { uuid, isUuid } = require("uuidv4");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 const projects = [];
+
 
 function logRequests(request, response, next) {
   const { method, url } = request;
